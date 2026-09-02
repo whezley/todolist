@@ -1,65 +1,61 @@
 const add = document.getElementById("addTaskButton");
 const taskInput = document.getElementById("taskInput");
 const list = document.getElementById("taskList");
-//const del =document.createElement();
+const clearButton = document.getElementById("clearAllButton");
+let tasks = JSON.parse(localStorage.getItem('task')) || [];
 
-
-
-function addd() {
-
-const li = document.createElement("li");
-const del =document.createElement("button");
-del.innerText = "del";
-
-
-li.innerHTML += taskInput.value;
-
-
-
-list.appendChild(li);
-li.appendChild(del);
-taskInput.value = "";
-del.addEventListener("click", () => {
-li.remove();
-
-});
+function clearAll() {
+    clearButton.addEventListener("click", function () {
+        localStorage.clear();
+        list.innerHTML = "";
+        tasks = [];
+        taskInput.value = "";
+    });
 }
 
+function saveTasks() {
+    add.addEventListener("click", function () {
+        if (taskInput.value === "") return;
+        tasks.push(taskInput.value);
+        localStorage.setItem("task", JSON.stringify(tasks));
+        list.innerHTML = "";
+        showTask();
+    });
+    taskInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            if (taskInput.value === "") return;
+            tasks.push(taskInput.value);
+            localStorage.setItem("task", JSON.stringify(tasks));
+            list.innerHTML = "";
+            showTask();
+        }
+    });
 
-
-
-
-//Adiciona a tarefa a lista quando o botao ADICIONAR e clicado.
-function adicionaTarefa() {
-
-add.addEventListener("click", function() {
-    //valida se o input esta vazio, caso esteja, exibe um alerta e nao adiciona a tarefa.
-if (taskInput.value === "") {
-    alert("Please enter a task.");
-    return;}
-
-addd();
-    
-  
-
-
-});
 }
-//Adiciona a tarefa a lista quando a tecla ENTER e pressionada.
-function adicionaTarefaEnter() {
-taskInput.addEventListener("keypress", function(event) {
 
-    if (event.key === "Enter") {
-if (taskInput.value === "") {
-    alert("Please enter a task.");
-    return;}
+function showTask() {
+    tasks.forEach((valor) => {
+        const li = document.createElement("li");
+        const btn =document.createElement("button");
+        btn.className = "btn btn-danger p-1 m-1";
+        btn.innerHTML = "X";
+        btn.addEventListener("click", function () {
+            const index = tasks.indexOf(valor);
+            tasks.splice(index, 1);
+            localStorage.setItem("task", JSON.stringify(tasks));
+            list.innerHTML = "";
+            showTask();
+        });
+        li.innerHTML = valor;
+        li.appendChild(btn);
+        list.appendChild(li);
+    });
+    taskInput.value = "";
+}
+function init() {
+    showTask();
+    saveTasks();
+    clearAll();
+}
 
-   addd();
-   
-    
-    }});}
-
-
-
-    adicionaTarefa();   
-    adicionaTarefaEnter();
+init();
